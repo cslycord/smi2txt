@@ -13,6 +13,7 @@ the appropriate options to ``use_setuptools()``.
 
 This file can also be run as a script to install or upgrade setuptools.
 """
+from past.builtins import cmp
 import os
 import shutil
 import sys
@@ -32,17 +33,20 @@ except ImportError:
 DEFAULT_VERSION = "1.4.2"
 DEFAULT_URL = "https://pypi.python.org/packages/source/s/setuptools/"
 
+
 def _python_cmd(*args):
     args = (sys.executable,) + args
     return subprocess.call(args) == 0
 
 def _check_call_py24(cmd, *args, **kwargs):
     res = subprocess.call(cmd, *args, **kwargs)
+
     class CalledProcessError(Exception):
         pass
     if not res == 0:
         msg = "Command '%s' return non-zero exit status %d" % (cmd, res)
         raise CalledProcessError(msg)
+
 vars(subprocess).setdefault('check_call', _check_call_py24)
 
 def _install(tarball, install_args=()):
@@ -72,7 +76,6 @@ def _install(tarball, install_args=()):
         os.chdir(old_wd)
         shutil.rmtree(tmpdir)
 
-
 def _build_egg(egg, tarball, to_dir):
     # extracting the tarball
     tmpdir = tempfile.mkdtemp()
@@ -101,7 +104,6 @@ def _build_egg(egg, tarball, to_dir):
     if not os.path.exists(egg):
         raise IOError('Could not build the egg.')
 
-
 def _do_download(version, download_base, to_dir, download_delay):
     egg = os.path.join(to_dir, 'setuptools-%s-py%d.%d.egg'
                        % (version, sys.version_info[0], sys.version_info[1]))
@@ -118,7 +120,6 @@ def _do_download(version, download_base, to_dir, download_delay):
 
     import setuptools
     setuptools.bootstrap_install_from = egg
-
 
 def use_setuptools(version=DEFAULT_VERSION, download_base=DEFAULT_URL,
                    to_dir=os.curdir, download_delay=15):
@@ -137,11 +138,11 @@ def use_setuptools(version=DEFAULT_VERSION, download_base=DEFAULT_URL,
         e = sys.exc_info()[1]
         if was_imported:
             sys.stderr.write(
-            "The required version of setuptools (>=%s) is not available,\n"
-            "and can't be installed while this script is running. Please\n"
-            "install a more recent version first, using\n"
-            "'easy_install -U setuptools'."
-            "\n\n(Currently using %r)\n" % (version, e.args[0]))
+                "The required version of setuptools (>=%s) is not available,\n"
+                "and can't be installed while this script is running. Please\n"
+                "install a more recent version first, using\n"
+                "'easy_install -U setuptools'."
+                "\n\n(Currently using %r)\n" % (version, e.args[0]))
             sys.exit(2)
         else:
             del pkg_resources, sys.modules['pkg_resources']    # reload ok
@@ -163,6 +164,7 @@ def _clean_check(cmd, target):
             os.unlink(target)
         raise
 
+
 def download_file_powershell(url, target):
     """
     Download the file at url to target using Powershell (which will validate
@@ -172,9 +174,10 @@ def download_file_powershell(url, target):
     cmd = [
         'powershell',
         '-Command',
-        "(new-object System.Net.WebClient).DownloadFile(%(url)r, %(target)r)" % vars(),
+        "(new-object System.Net.WebClient).DownloadFile(%(url)r, %(target)r)" %vars(),
     ]
     _clean_check(cmd, target)
+
 
 def has_powershell():
     if platform.system() != 'Windows':
@@ -375,7 +378,7 @@ def main(version=DEFAULT_VERSION):
     """Install or upgrade setuptools and EasyInstall"""
     options = _parse_args()
     tarball = download_setuptools(download_base=options.download_base,
-        downloader_factory=options.downloader_factory)
+                                  downloader_factory=options.downloader_factory)
     return _install(tarball, _build_install_args(options))
 
 if __name__ == '__main__':

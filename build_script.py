@@ -1,8 +1,9 @@
 #!/bin/python
 
-import os,sys
+import os
+import sys
 import shlex
-from subprocess import Popen, PIPE, call #@UnusedImport
+from subprocess import Popen, PIPE, call  # @UnusedImport
 
 
 pkg_name = "smi2txt"
@@ -11,12 +12,13 @@ doc_build_dest = "_build"
 doc_build_src = "doc"
 RELEASE_DIR = "Release"
 
+
 def shlep(cmd="", env=None):
     '''shlex split and popen
     '''
     parsed_cmd = shlex.split(cmd)
-    #print parsed_cmd
-    #ret = call(parsed_cmd)
+    # print parsed_cmd
+    # ret = call(parsed_cmd)
     p = Popen(parsed_cmd, env=env)
     p.communicate()
     ret = p.returncode
@@ -24,21 +26,21 @@ def shlep(cmd="", env=None):
 
 # Find script directory
 _dname = os.path.dirname(os.path.realpath(__file__))
-pkg_loc = _dname + os.path.sep+pkg_name 
+pkg_loc = _dname + os.path.sep+pkg_name
 sys.path.append(pkg_loc)
 
 
 # Check installation of Sphinx, setuptools
 try:
     import sphinx
-except:
+except ImportError:
     print("sphinx is not installed")
     sys.exit(1)
 print("sphinx version is {0}".format(sphinx.__version__))
 
 try:
     import setuptools
-except:
+except ImportError:
     print("setuptools is not installed")
     sys.exit(1)
 print("setuptools version is {0}".format(setuptools.__version__))
@@ -82,7 +84,7 @@ ret = shlep(cmd)
 # setup.py absolute path
 setup_file = _dname + os.path.sep + 'setup.py'
 
-print ("Building {0} package ...".format(pkg_name))
+print("Building {0} package ...".format(pkg_name))
 dist = _dname + os.path.sep + RELEASE_DIR
 if not os.path.exists(dist):
     cmd = 'mkdir ' + dist
@@ -95,5 +97,3 @@ egg_dir = _dname + os.path.sep + pkg_name + '.egg-info' + os.path.sep
 if os.path.exists(egg_dir):
     cmd = 'rm -rf ' + egg_dir
     ret = shlep(cmd)
-
-
